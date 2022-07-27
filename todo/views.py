@@ -41,3 +41,9 @@ def loginuser(request):
         else:
             login (request, user)
             return redirect('currenttodos')
+
+def createtodo(request):
+    if request.method == 'GET':
+        return render(request, 'todo/createtodo.html', {'form':AuthenticationForm()})
+    else:
+        pass
