@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
+from .forms import TodoForm
+from .models import Todolist
 
 def home(request):
     return render(request, 'todo/home.html')
@@ -24,7 +26,8 @@ def sign_up(request):
             return render(request, 'todo/sign_up.html', {'form': UserCreationForm(), 'error':'The passwords did not match'})
 
 def currenttodos(request):
-    return render(request, 'todo/currenttodos.html')
+    todos = Todolist.objects.all()
+    return render(request, 'todo/currenttodos.html', {'todos':todos})
 
 def logoutuser(request):
     if request.method == 'POST':
@@ -42,8 +45,13 @@ def loginuser(request):
             login (request, user)
             return redirect('currenttodos')
 
+
 def createtodo(request):
     if request.method == 'GET':
-        return render(request, 'todo/createtodo.html', {'form':AuthenticationForm()})
+        return render(request, 'todo/createtodo.html', {'form':TodoForm()})
     else:
-        pass
+        form = TodoForm(request.POST)
+        newtodo = form.save(commit=False)
+        newtodo.user = request.user
+        newtodo.save()
+        return redirect('currenttodos')
