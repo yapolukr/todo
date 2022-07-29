@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
@@ -26,7 +26,7 @@ def sign_up(request):
             return render(request, 'todo/sign_up.html', {'form': UserCreationForm(), 'error':'The passwords did not match'})
 
 def currenttodos(request):
-    todos = Todolist.objects.all()
+    todos = Todolist.objects.filter(user=request.user, datecompleted__isnull=True)
     return render(request, 'todo/currenttodos.html', {'todos':todos})
 
 def logoutuser(request):
@@ -55,3 +55,13 @@ def createtodo(request):
         newtodo.user = request.user
         newtodo.save()
         return redirect('currenttodos')
+
+def viewtodo(request, todo_pk):
+        todo = get_object_or_404(Todolist, pk=todo_pk)
+        if request.method == 'GET':
+            form = TodoForm(instance=todo)
+            return render(request, 'todo/detailtodo.html', {'todo':todo, 'form':form})
+        else:
+            form = TodoForm(request.POST, instance=todo)
+            form.save()
+            return redirect('currenttodos')
