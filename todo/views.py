@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 from .models import Todolist
+from django.utils import timezone
 
 def home(request):
     return render(request, 'todo/home.html')
@@ -65,3 +66,10 @@ def viewtodo(request, todo_pk):
             form = TodoForm(request.POST, instance=todo)
             form.save()
             return redirect('currenttodos')
+
+def completetodo(request, todo_pk):
+    todo = get_object_or_404(Todolist, pk=todo_pk, user = request.user)
+    if request.method == 'POST':
+        todo.datecompleted = timezone.now()
+        todo.save()
+        return redirect('detailtodos')
