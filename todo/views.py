@@ -72,4 +72,4 @@ def completetodo(request, todo_pk):
     if request.method == 'POST':
         todo.datecompleted = timezone.now()
         todo.save()
-        return redirect('detailtodos')
+        return redirect('currenttodos')
